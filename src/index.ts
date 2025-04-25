@@ -638,7 +638,21 @@ const server = new Server(
   },
   {
     capabilities: {
-      tools: {},
+      tools: {
+        status: {
+          description: "Check operational status of major digital platforms",
+          schema: {
+            type: "object",
+            properties: {
+              command: {
+                type: "string",
+                description: "Command to execute (list, --all, or platform with -- prefix like --github)"
+              }
+            },
+            required: ["command"]
+          }
+        }
+      },
     },
   }
 );

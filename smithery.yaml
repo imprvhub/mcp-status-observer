@@ -1,6 +1,6 @@
 name: mcp-status-observer
-displayName: MCP Status Observer
-description: Monitor the operational status of major digital platforms in Claude Desktop using the Model Context Protocol
+displayName: Status Observer MCP
+description: Monitor the operational status of major digital platforms in Claude Desktop using a Model Context Protocol Server.
 visibility: public
 type: mcp
 author:
@@ -18,7 +18,15 @@ files:
   - tsconfig.json
   - Dockerfile
   - src/index.ts
-logo: public/assets/preview.png
-badges:
-  - type: smithery
-    id: '@imprvhub/mcp-status-observer'
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties: {}
+  commandFunction: |-
+    (config) => ({
+      command: 'node',
+      args: ['build/index.js'],
+      env: {}
+    })
+  exampleConfig: {}
