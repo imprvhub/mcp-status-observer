@@ -4,6 +4,10 @@
 
 An integration that allows Claude Desktop to monitor and query the operational status of major digital platforms using the Model Context Protocol (MCP).
 
+<a href="https://glama.ai/mcp/servers/@imprvhub/mcp-status-observer">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@imprvhub/mcp-status-observer/badge" alt="Status Observer MCP server" />
+</a>
+
 ## Features
 
 - Monitor world's most used digital platforms (GitHub, Slack, Discord, etc.)
@@ -19,7 +23,6 @@ An integration that allows Claude Desktop to monitor and query the operational s
     <img src="public/assets/preview.png" width="600" alt="Status Observer MCP Demo">
   </a>
 </p>
-
 
 <details>
 <summary> Timestamps </summary>
