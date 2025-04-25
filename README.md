@@ -168,6 +168,7 @@ status --cloudflare
 status --digitalocean
 status --discord
 status --dropbox
+status --gcp
 status --github
 status --linkedin
 status --netlify
@@ -190,6 +191,7 @@ You can also interact with the MCP using natural language. Claude will interpret
 - "What's the current status of LinkedIn?"
 - "Pull Requests are down? What's the status of GitHub?"
 - "Show me the status of all major platforms"
+- "Could you check if there are any issues with Google Cloud Platform services right now?"
 
 ## Troubleshooting
 
