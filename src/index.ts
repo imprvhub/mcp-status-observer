@@ -40,6 +40,26 @@ interface AtlassianStatusResponse {
   error?: string;
 }
 
+interface GCPStatusResponse {
+  overall: string;
+  lastUpdated: string;
+  services: Array<{
+    name: string;
+    status: string;
+    statusClass: string;
+    regions?: {
+      [key: string]: string;
+    };
+  }>;
+  incidents?: Array<{
+    title: string;
+    products: string;
+    locations: string;
+    updates: string[];
+  }>;
+  error?: string;
+}
+
 interface LinkedInStatusResponse {
   overall: string;
   lastUpdated: string;
@@ -135,6 +155,7 @@ class StatusObserver {
     this.addPlatform('digitalocean', 'DigitalOcean', 'https://status.digitalocean.com/api/v2/summary.json', 'Cloud infrastructure provider');
     this.addPlatform('discord', 'Discord', 'https://discordstatus.com/api/v2/summary.json', 'VoIP and instant messaging platform');
     this.addPlatform('dropbox', 'Dropbox', 'https://status.dropbox.com/api/v2/summary.json', 'File hosting service');
+    this.addPlatform('gcp', 'Google Cloud Platform', 'https://status-observer-helpers.vercel.app/gcp', 'Cloud computing services and APIs');
     this.addPlatform('github', 'GitHub', 'https://www.githubstatus.com/api/v2/summary.json', 'Development platform for version control and collaboration');
     this.addPlatform('linkedin', 'LinkedIn', this.linkedInApiUrl, 'Business and employment-focused social media platform');
     this.addPlatform('netlify', 'Netlify', 'https://www.netlifystatus.com/api/v2/summary.json', 'Web development platform');
@@ -165,6 +186,10 @@ class StatusObserver {
     try {
       if (platformId === 'atlassian') {
         return await this.getAtlassianStatus(platform);
+      }
+
+      if (platformId === 'gcp') {
+        return await this.getGCPStatus(platform);
       }
 
       if (platformId === 'linkedin') {
@@ -241,6 +266,75 @@ class StatusObserver {
       console.error(`Error fetching Atlassian status:`, error);
       return `Unable to fetch real-time status for Atlassian. The API might be unavailable.`;
     }
+  }
+
+  private async getGCPStatus(platform: PlatformStatus): Promise<string> {
+    try {
+      const response = await axios.get<GCPStatusResponse>(platform.url);
+      const data = response.data;
+      
+      let statusOutput = `${platform.name} Status:\n`;
+      statusOutput += `Overall: ${this.normalizeStatus(data.overall)}\n\n`;
+      
+      if (data.incidents && data.incidents.length > 0) {
+        statusOutput += `Active Incidents:\n`;
+        data.incidents.forEach(incident => {
+          statusOutput += `- ${incident.title}\n`;
+          statusOutput += `  Affected Products: ${incident.products}\n`;
+          statusOutput += `  Affected Locations: ${incident.locations}\n`;
+          if (incident.updates && incident.updates.length > 0) {
+            statusOutput += `  Latest Update: ${incident.updates[0]}\n`;
+          }
+        });
+        statusOutput += `\n`;
+      }
+
+      if (data.services && data.services.length > 0) {
+        statusOutput += `Service Status by Region:\n\n`;
+        
+        const sortedServices = [...data.services].sort((a, b) => 
+          a.name.localeCompare(b.name)
+        );
+        
+        sortedServices.forEach(service => {
+          if (service.regions && Object.keys(service.regions).length > 0) {
+            statusOutput += `${service.name}:\n`;
+
+            Object.entries(service.regions).forEach(([region, status]) => {
+              if (status) {
+                const regionName = this.formatRegionName(region);
+                statusOutput += `  ${regionName}: ${status}\n`;
+              }
+            });
+            
+            statusOutput += `\n`;
+          }
+        });
+      } else {
+        statusOutput += `No detailed service information available.\n`;
+      }
+      
+      statusOutput += `Last Updated: ${this.formatUpdateTime(data.lastUpdated || new Date().toISOString())}`;
+      
+      return statusOutput;
+    } catch (error) {
+      console.error(`Error fetching GCP status:`, error);
+      return `Unable to fetch real-time status for Google Cloud Platform. The API might be unavailable.`;
+    }
+  }
+
+  private formatRegionName(region: string): string {
+    const nameMap: Record<string, string> = {
+      americas: 'Americas',
+      europe: 'Europe',
+      asiaPacific: 'Asia Pacific',
+      middleEast: 'Middle East',
+      africa: 'Africa',
+      multiRegions: 'Multi-regions',
+      global: 'Global'
+    };
+    
+    return nameMap[region] || region;
   }
 
   private async getLinkedInStatus(platform: PlatformStatus): Promise<string> {
@@ -480,6 +574,12 @@ class StatusObserver {
     try {
       if (platformId === 'atlassian') {
         const response = await axios.get<AtlassianStatusResponse>(platform.url);
+        const data = response.data;
+        return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
+      }
+
+      if (platformId === 'gcp') {
+        const response = await axios.get<GCPStatusResponse>(platform.url);
         const data = response.data;
         return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
       }
