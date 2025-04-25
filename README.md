@@ -1,5 +1,7 @@
 # MCP Status Observer
 
+[![smithery badge](https://smithery.ai/badge/@imprvhub/mcp-status-observer)](https://smithery.ai/server/@imprvhub/mcp-status-observer)
+
 An integration that allows Claude Desktop to monitor and query the operational status of major digital platforms using the Model Context Protocol (MCP).
 
 ## Features
