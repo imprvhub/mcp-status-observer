@@ -178,6 +178,9 @@ status --x
 status list
 ```
 
+### Preview
+![GCP Status Monitoring Preview](https://github.com/imprvhub/mcp-status-observer/raw/main/public/assets/gcp.png)
+
 ### Natural Language Queries:
 
 You can also interact with the MCP using natural language. Claude will interpret these requests and use the appropriate commands:
