@@ -1,0 +1,24 @@
+name: mcp-status-observer
+displayName: MCP Status Observer
+description: Monitor the operational status of major digital platforms in Claude Desktop using the Model Context Protocol
+visibility: public
+type: mcp
+author:
+  name: Iván Luna
+  url: https://github.com/imprvhub
+repository: https://github.com/imprvhub/mcp-status-observer
+keywords:
+  - status
+  - monitoring
+  - platforms
+  - operational
+files:
+  - README.md
+  - package.json
+  - tsconfig.json
+  - Dockerfile
+  - src/index.ts
+logo: public/assets/preview.png
+badges:
+  - type: smithery
+    id: '@imprvhub/mcp-status-observer'
