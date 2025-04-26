@@ -181,6 +181,7 @@ status --digitalocean
 status --discord
 status --dropbox
 status --gcp
+status --gemini 
 status --github
 status --linkedin
 status --netlify
@@ -206,6 +207,7 @@ You can also interact with the MCP using natural language. Claude will interpret
 - "Is OpenAI experiencing any outages at the moment?"
 - "What's the current status of LinkedIn?"
 - "Pull Requests are down? What's the status of GitHub?"
+- "Can you tell me if Google's Gemini AI is experiencing any service disruptions or outages right now?"
 - "Show me the status of all major platforms"
 
 ## Troubleshooting

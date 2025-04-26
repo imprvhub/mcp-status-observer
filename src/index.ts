@@ -78,6 +78,22 @@ interface GCPStatusResponse {
   error?: string;
 }
 
+interface GeminiStatusResponse {
+  overall: string;
+  lastUpdated: string;
+  services: Array<{
+    name: string;
+    status: string;
+    statusClass: string;
+  }>;
+  incidents?: Array<{
+    title: string;
+    description: string;
+    status: string;
+  }>;
+  error?: string;
+}
+
 interface LinkedInStatusResponse {
   overall: string;
   lastUpdated: string;
@@ -174,42 +190,45 @@ class StatusObserver {
   private platforms: Map<string, PlatformStatus>;
   private anthropicApiUrl: string;
   private atlassianApiUrl: string;
+  private geminiApiUrl: string;
   private linkedInApiUrl: string;
   private openaiApiUrl: string;
   private supabaseApiUrl: string;
   private xApiUrl: string;
 
   constructor() {
-    this.platforms = new Map();
-    this.atlassianApiUrl = 'https://status-observer-helpers.vercel.app/atlassian';
-    this.linkedInApiUrl = 'https://status-observer-helpers.vercel.app/linkedin';
-    this.xApiUrl = 'https://status-observer-helpers.vercel.app/x';
-    this.supabaseApiUrl = 'https://status-observer-helpers.vercel.app/supabase';
-    this.openaiApiUrl = 'https://status-observer-helpers.vercel.app/openai';
     this.anthropicApiUrl = 'https://status-observer-helpers.vercel.app/anthropic';
+    this.atlassianApiUrl = 'https://status-observer-helpers.vercel.app/atlassian';
+    this.geminiApiUrl = 'https://status-observer-helpers.vercel.app/gemini';
+    this.linkedInApiUrl = 'https://status-observer-helpers.vercel.app/linkedin';
+    this.openaiApiUrl = 'https://status-observer-helpers.vercel.app/openai';
+    this.platforms = new Map();
+    this.supabaseApiUrl = 'https://status-observer-helpers.vercel.app/supabase';
+    this.xApiUrl = 'https://status-observer-helpers.vercel.app/x';
     this.initializePlatforms();
   }
 
   private initializePlatforms() {
-    this.addPlatform('amplitude', 'Amplitude', 'https://status.amplitude.com/api/v2/summary.json', 'Product analytics platform');
-    this.addPlatform('anthropic', 'Anthropic', this.anthropicApiUrl, 'AI assistant provider and creator of Claude');
-    this.addPlatform('asana', 'Asana', 'https://status.asana.com/api/v2/summary.json', 'Work management platform for teams');
-    this.addPlatform('atlassian', 'Atlassian', this.atlassianApiUrl, 'Software development and collaboration tools provider');
-    this.addPlatform('cloudflare', 'Cloudflare', 'https://www.cloudflarestatus.com/api/v2/summary.json', 'Web infrastructure and security company');
-    this.addPlatform('digitalocean', 'DigitalOcean', 'https://status.digitalocean.com/api/v2/summary.json', 'Cloud infrastructure provider');
-    this.addPlatform('discord', 'Discord', 'https://discordstatus.com/api/v2/summary.json', 'VoIP and instant messaging platform');
-    this.addPlatform('dropbox', 'Dropbox', 'https://status.dropbox.com/api/v2/summary.json', 'File hosting service');
-    this.addPlatform('gcp', 'Google Cloud Platform', 'https://status-observer-helpers.vercel.app/gcp', 'Cloud computing services and APIs');
-    this.addPlatform('github', 'GitHub', 'https://www.githubstatus.com/api/v2/summary.json', 'Development platform for version control and collaboration');
-    this.addPlatform('linkedin', 'LinkedIn', this.linkedInApiUrl, 'Business and employment-focused social media platform');
+    this.addPlatform('amplitude', 'Amplitude', 'https://status.amplitude.com/api/v2/summary.json', 'Analytics platform');
+    this.addPlatform('anthropic', 'Anthropic', this.anthropicApiUrl, 'AI assistant provider');
+    this.addPlatform('asana', 'Asana', 'https://status.asana.com/api/v2/summary.json', 'Team workflow management');
+    this.addPlatform('atlassian', 'Atlassian', this.atlassianApiUrl, 'Developer collaboration tools');
+    this.addPlatform('cloudflare', 'Cloudflare', 'https://www.cloudflarestatus.com/api/v2/summary.json', 'Web infrastructure and security');
+    this.addPlatform('digitalocean', 'DigitalOcean', 'https://status.digitalocean.com/api/v2/summary.json', 'Cloud infrastructure');
+    this.addPlatform('discord', 'Discord', 'https://discordstatus.com/api/v2/summary.json', 'Messaging platform');
+    this.addPlatform('dropbox', 'Dropbox', 'https://status.dropbox.com/api/v2/summary.json', 'File hosting');
+    this.addPlatform('gcp', 'Google Cloud Platform', 'https://status-observer-helpers.vercel.app/gcp', 'Cloud computing services');
+    this.addPlatform('gemini', 'Gemini', this.geminiApiUrl, 'Multimodal AI platform');
+    this.addPlatform('github', 'GitHub', 'https://www.githubstatus.com/api/v2/summary.json', 'Version control platform');
+    this.addPlatform('linkedin', 'LinkedIn', this.linkedInApiUrl, 'Professional network');
     this.addPlatform('netlify', 'Netlify', 'https://www.netlifystatus.com/api/v2/summary.json', 'Web development platform');
-    this.addPlatform('npm', 'npm', 'https://status.npmjs.org/api/v2/summary.json', 'Package manager for JavaScript');
-    this.addPlatform('openai', 'OpenAI', this.openaiApiUrl, 'AI platform and API provider');
-    this.addPlatform('reddit', 'Reddit', 'https://www.redditstatus.com/api/v2/summary.json', 'Social news aggregation and discussion website');
-    this.addPlatform('slack', 'Slack', 'https://status.slack.com/api/v2.0.0/current', 'Business communication platform');
-    this.addPlatform('supabase', 'Supabase', this.supabaseApiUrl, 'Open source Firebase alternative');
-    this.addPlatform('twilio', 'Twilio', 'https://status.twilio.com/api/v2/summary.json', 'Cloud communications platform');
-    this.addPlatform('vercel', 'Vercel', 'https://www.vercel-status.com/api/v2/summary.json', 'Platform for frontend frameworks and static sites');
+    this.addPlatform('npm', 'npm', 'https://status.npmjs.org/api/v2/summary.json', 'JavaScript package manager');
+    this.addPlatform('openai', 'OpenAI', this.openaiApiUrl, 'AI services provider');
+    this.addPlatform('reddit', 'Reddit', 'https://www.redditstatus.com/api/v2/summary.json', 'Social news platform');
+    this.addPlatform('slack', 'Slack', 'https://status.slack.com/api/v2.0.0/current', 'Business communication');
+    this.addPlatform('supabase', 'Supabase', this.supabaseApiUrl, 'Open source backend platform');
+    this.addPlatform('twilio', 'Twilio', 'https://status.twilio.com/api/v2/summary.json', 'Cloud communications');
+    this.addPlatform('vercel', 'Vercel', 'https://www.vercel-status.com/api/v2/summary.json', 'Frontend deployment platform');
     this.addPlatform('x', 'X', this.xApiUrl, 'Social media platform');
   }
 
@@ -239,6 +258,10 @@ class StatusObserver {
 
       if (platformId === 'gcp') {
         return await this.getGCPStatus(platform);
+      }
+
+      if (platformId === 'gemini') {
+        return await this.getGeminiStatus(platform);
       }
 
       if (platformId === 'linkedin') {
@@ -435,6 +458,45 @@ class StatusObserver {
     };
     
     return nameMap[region] || region;
+  }
+
+  private async getGeminiStatus(platform: PlatformStatus): Promise<string> {
+    try {
+      const response = await axios.get<GeminiStatusResponse>(platform.url);
+      const data = response.data;
+      
+      let statusOutput = `${platform.name} Status:\n`;
+      statusOutput += `Overall: ${this.normalizeStatus(data.overall)}\n\n`;
+
+      if (data.services && data.services.length > 0) {
+        statusOutput += `Components:\n`;
+        data.services.forEach(service => {
+          statusOutput += `- ${service.name}: ${this.normalizeStatus(service.status)}\n`;
+        });
+      } else {
+        statusOutput += `No component information available.\n`;
+      }
+
+      if (data.incidents && data.incidents.length > 0) {
+        statusOutput += `\nActive Incidents:\n`;
+        data.incidents.forEach(incident => {
+          statusOutput += `- ${incident.title}\n`;
+          if (incident.description) {
+            statusOutput += `  Description: ${incident.description}\n`;
+          }
+          if (incident.status) {
+            statusOutput += `  Status: ${incident.status}\n`;
+          }
+        });
+      }
+      
+      statusOutput += `\nLast Updated: ${this.formatUpdateTime(data.lastUpdated || new Date().toISOString())}`;
+      
+      return statusOutput;
+    } catch (error) {
+      console.error(`Error fetching Gemini status:`, error);
+      return `Unable to fetch real-time status for Gemini. The API might be unavailable.`;
+    }
   }
 
   private async getLinkedInStatus(platform: PlatformStatus): Promise<string> {
@@ -732,7 +794,7 @@ class StatusObserver {
         const data = response.data;
         return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
       }
-      
+
       if (platformId === 'atlassian') {
         const response = await axios.get<AtlassianStatusResponse>(platform.url);
         const data = response.data;
@@ -747,6 +809,12 @@ class StatusObserver {
       
       if (platformId === 'linkedin') {
         const response = await axios.get<LinkedInStatusResponse>(platform.url);
+        const data = response.data;
+        return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
+      }
+
+      if (platformId === 'gemini') {
+        const response = await axios.get<GeminiStatusResponse>(platform.url);
         const data = response.data;
         return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
       }
