@@ -173,6 +173,7 @@ Here are various examples of how to use the Status Observer with Claude:
 ```
 status --all
 status --amplitude
+status --anthropic
 status --asana
 status --atlassian
 status --cloudflare
@@ -201,11 +202,11 @@ status list
 You can also interact with the MCP using natural language. Claude will interpret these requests and use the appropriate commands:
 
 - "Could you check if there are any issues with Google Cloud Platform services right now?"
+- "Has there been any recent issues with Claude or the Anthropic API?"
 - "Is OpenAI experiencing any outages at the moment?"
 - "What's the current status of LinkedIn?"
 - "Pull Requests are down? What's the status of GitHub?"
 - "Show me the status of all major platforms"
-
 
 ## Troubleshooting
 

@@ -28,6 +28,24 @@ interface StatusResponse {
   };
 }
 
+interface AnthropicStatusResponse {
+  overall: string;
+  lastUpdated: string;
+  services: Array<{
+    name: string;
+    status: string;
+    statusClass: string;
+    uptime?: number;
+  }>;
+  incidents?: Array<{
+    date: string;
+    title: string;
+    impact?: string;
+    updates?: string[];
+  }>;
+  error?: string;
+}
+
 interface AtlassianStatusResponse {
   overall: string;
   lastUpdated: string;
@@ -154,11 +172,12 @@ interface SupabaseStatusResponse {
 
 class StatusObserver {
   private platforms: Map<string, PlatformStatus>;
+  private anthropicApiUrl: string;
   private atlassianApiUrl: string;
   private linkedInApiUrl: string;
-  private xApiUrl: string;
-  private supabaseApiUrl: string;
   private openaiApiUrl: string;
+  private supabaseApiUrl: string;
+  private xApiUrl: string;
 
   constructor() {
     this.platforms = new Map();
@@ -167,11 +186,13 @@ class StatusObserver {
     this.xApiUrl = 'https://status-observer-helpers.vercel.app/x';
     this.supabaseApiUrl = 'https://status-observer-helpers.vercel.app/supabase';
     this.openaiApiUrl = 'https://status-observer-helpers.vercel.app/openai';
+    this.anthropicApiUrl = 'https://status-observer-helpers.vercel.app/anthropic';
     this.initializePlatforms();
   }
 
   private initializePlatforms() {
     this.addPlatform('amplitude', 'Amplitude', 'https://status.amplitude.com/api/v2/summary.json', 'Product analytics platform');
+    this.addPlatform('anthropic', 'Anthropic', this.anthropicApiUrl, 'AI assistant provider and creator of Claude');
     this.addPlatform('asana', 'Asana', 'https://status.asana.com/api/v2/summary.json', 'Work management platform for teams');
     this.addPlatform('atlassian', 'Atlassian', this.atlassianApiUrl, 'Software development and collaboration tools provider');
     this.addPlatform('cloudflare', 'Cloudflare', 'https://www.cloudflarestatus.com/api/v2/summary.json', 'Web infrastructure and security company');
@@ -208,6 +229,10 @@ class StatusObserver {
     }
   
     try {
+      if (platformId === 'anthropic') {
+        return await this.getAnthropicStatus(platform);
+      }
+
       if (platformId === 'atlassian') {
         return await this.getAtlassianStatus(platform);
       }
@@ -267,6 +292,53 @@ class StatusObserver {
       console.error(`Error fetching status for ${platform.name}:`, error);
       
       return `Unable to fetch real-time status for ${platform.name}. The status API might be unavailable or the format has changed.`;
+    }
+  }
+
+  private async getAnthropicStatus(platform: PlatformStatus): Promise<string> {
+    try {
+      const response = await axios.get<AnthropicStatusResponse>(platform.url);
+      const data = response.data;
+      
+      let statusOutput = `${platform.name} Status:\n`;
+      statusOutput += `Overall: ${this.normalizeStatus(data.overall)}\n\n`;
+
+      if (data.services && data.services.length > 0) {
+        statusOutput += `Components:\n`;
+        data.services.forEach(service => {
+          let serviceInfo = `- ${service.name}: ${this.normalizeStatus(service.status)}`;
+          
+          if (service.uptime) {
+            serviceInfo += ` (Uptime: ${service.uptime}%)`;
+          }
+          
+          statusOutput += `${serviceInfo}\n`;
+        });
+      } else {
+        statusOutput += `No component information available.\n`;
+      }
+      
+      if (data.incidents && data.incidents.length > 0) {
+        statusOutput += `\nRecent Incidents:\n`;
+        data.incidents.slice(0, 3).forEach(incident => {
+          statusOutput += `- ${incident.date}: ${incident.title}\n`;
+          
+          if (incident.impact) {
+            statusOutput += `  Impact: ${incident.impact}\n`;
+          }
+          
+          if (incident.updates && incident.updates.length > 0) {
+            statusOutput += `  Latest update: ${incident.updates[0]}\n`;
+          }
+        });
+      }
+      
+      statusOutput += `\nLast Updated: ${this.formatUpdateTime(data.lastUpdated || new Date().toISOString())}`;
+      
+      return statusOutput;
+    } catch (error) {
+      console.error(`Error fetching Anthropic status:`, error);
+      return `Unable to fetch real-time status for Anthropic. The API might be unavailable.`;
     }
   }
   
@@ -655,6 +727,12 @@ class StatusObserver {
     }
 
     try {
+      if (platformId === 'anthropic') {
+        const response = await axios.get<AnthropicStatusResponse>(platform.url);
+        const data = response.data;
+        return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
+      }
+      
       if (platformId === 'atlassian') {
         const response = await axios.get<AtlassianStatusResponse>(platform.url);
         const data = response.data;
