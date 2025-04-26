@@ -81,6 +81,27 @@ interface LinkedInStatusResponse {
   error?: string;
 }
 
+interface OpenAIStatusResponse {
+  overall: string;
+  lastUpdated: string;
+  services: Array<{
+    name: string;
+    status: string;
+    statusClass: string;
+    components?: number;
+    uptime?: number;
+  }>;
+  incidents?: Array<{
+    title: string;
+    description: string;
+    status?: string;
+    duration?: string;
+    affects?: string;
+    statusInfo?: string;
+  }>;
+  error?: string;
+}
+
 interface XStatusResponse {
   overall: string;
   lastUpdated: string;
@@ -137,6 +158,7 @@ class StatusObserver {
   private linkedInApiUrl: string;
   private xApiUrl: string;
   private supabaseApiUrl: string;
+  private openaiApiUrl: string;
 
   constructor() {
     this.platforms = new Map();
@@ -144,6 +166,7 @@ class StatusObserver {
     this.linkedInApiUrl = 'https://status-observer-helpers.vercel.app/linkedin';
     this.xApiUrl = 'https://status-observer-helpers.vercel.app/x';
     this.supabaseApiUrl = 'https://status-observer-helpers.vercel.app/supabase';
+    this.openaiApiUrl = 'https://status-observer-helpers.vercel.app/openai';
     this.initializePlatforms();
   }
 
@@ -160,6 +183,7 @@ class StatusObserver {
     this.addPlatform('linkedin', 'LinkedIn', this.linkedInApiUrl, 'Business and employment-focused social media platform');
     this.addPlatform('netlify', 'Netlify', 'https://www.netlifystatus.com/api/v2/summary.json', 'Web development platform');
     this.addPlatform('npm', 'npm', 'https://status.npmjs.org/api/v2/summary.json', 'Package manager for JavaScript');
+    this.addPlatform('openai', 'OpenAI', this.openaiApiUrl, 'AI platform and API provider');
     this.addPlatform('reddit', 'Reddit', 'https://www.redditstatus.com/api/v2/summary.json', 'Social news aggregation and discussion website');
     this.addPlatform('slack', 'Slack', 'https://status.slack.com/api/v2.0.0/current', 'Business communication platform');
     this.addPlatform('supabase', 'Supabase', this.supabaseApiUrl, 'Open source Firebase alternative');
@@ -194,6 +218,10 @@ class StatusObserver {
 
       if (platformId === 'linkedin') {
         return await this.getLinkedInStatus(platform);
+      }
+
+      if (platformId === 'openai') {
+        return await this.getOpenAIStatus(platform);
       }
 
       if (platformId === 'supabase') {
@@ -371,6 +399,61 @@ class StatusObserver {
     } catch (error) {
       console.error(`Error fetching LinkedIn status:`, error);
       return `Unable to fetch real-time status for LinkedIn. The API might be unavailable.`;
+    }
+  }
+
+  private async getOpenAIStatus(platform: PlatformStatus): Promise<string> {
+    try {
+      const response = await axios.get<OpenAIStatusResponse>(platform.url);
+      const data = response.data;
+      
+      let statusOutput = `${platform.name} Status:\n`;
+      statusOutput += `Overall: ${this.normalizeStatus(data.overall)}\n\n`;
+
+      if (data.incidents && data.incidents.length > 0) {
+        statusOutput += `Active Incidents:\n`;
+        data.incidents.forEach(incident => {
+          statusOutput += `- ${incident.title}\n`;
+          if (incident.description) {
+            statusOutput += `  Description: ${incident.description}\n`;
+          }
+          if (incident.affects) {
+            statusOutput += `  Affects: ${incident.affects}\n`;
+          }
+          if (incident.duration) {
+            statusOutput += `  Duration: ${incident.duration}\n`;
+          }
+          if (incident.status) {
+            statusOutput += `  Status: ${incident.status}\n`;
+          }
+        });
+        statusOutput += `\n`;
+      }
+      
+      if (data.services && data.services.length > 0) {
+        statusOutput += `Components:\n`;
+        data.services.forEach(service => {
+          let serviceInfo = `- ${service.name}: ${this.normalizeStatus(service.status)}`;
+          if (service.uptime) {
+            serviceInfo += ` (Uptime: ${service.uptime}%)`;
+          }
+
+          if (service.components) {
+            serviceInfo += ` (${service.components} subcomponents)`;
+          }
+          
+          statusOutput += `${serviceInfo}\n`;
+        });
+      } else {
+        statusOutput += `No component information available.\n`;
+      }
+      
+      statusOutput += `\nLast Updated: ${this.formatUpdateTime(data.lastUpdated || new Date().toISOString())}`;
+      
+      return statusOutput;
+    } catch (error) {
+      console.error(`Error fetching OpenAI status:`, error);
+      return `Unable to fetch real-time status for OpenAI. The API might be unavailable.`;
     }
   }
 
@@ -586,6 +669,12 @@ class StatusObserver {
       
       if (platformId === 'linkedin') {
         const response = await axios.get<LinkedInStatusResponse>(platform.url);
+        const data = response.data;
+        return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
+      }
+
+      if (platformId === 'openai') {
+        const response = await axios.get<OpenAIStatusResponse>(platform.url);
         const data = response.data;
         return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
       }

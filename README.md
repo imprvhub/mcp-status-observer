@@ -11,6 +11,11 @@
 </tr>
 </table>
 
+> [!NOTE]
+> This project is continuously updated with new platform integrations. If you're not seeing a service that should be available, or if Claude doesn't recognize a platform, please update by running `npm run build` from a freshly cloned repository. 
+> 
+> **Last updated**: 2025-04-26T19:28:00Z (UTC) - Added OpenAI status integration
+
 ## Features
 
 - Monitor world's most used digital platforms (GitHub, Slack, Discord, etc.)
@@ -179,6 +184,7 @@ status --github
 status --linkedin
 status --netlify
 status --npm
+status --openai
 status --reddit
 status --slack
 status --twilio
@@ -194,10 +200,12 @@ status list
 
 You can also interact with the MCP using natural language. Claude will interpret these requests and use the appropriate commands:
 
+- "Could you check if there are any issues with Google Cloud Platform services right now?"
+- "Is OpenAI experiencing any outages at the moment?"
 - "What's the current status of LinkedIn?"
 - "Pull Requests are down? What's the status of GitHub?"
 - "Show me the status of all major platforms"
-- "Could you check if there are any issues with Google Cloud Platform services right now?"
+
 
 ## Troubleshooting
 
