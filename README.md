@@ -14,7 +14,7 @@
 > [!NOTE]
 > This project is continuously updated with new platform integrations. If you're not seeing a service that should be available, or if Claude doesn't recognize a platform, please update by running `npm run build` from a freshly cloned repository. 
 > 
-> **Last updated**: 2025-04-26T19:28:00Z (UTC) - Added OpenAI status integration
+> **Last updated**: 2025-04-26T20:08:00Z (UTC) - Added Docker status integration
 
 ## Features
 
@@ -179,6 +179,7 @@ status --atlassian
 status --cloudflare
 status --digitalocean
 status --discord
+status --docker
 status --dropbox
 status --gcp
 status --gemini 
@@ -198,7 +199,7 @@ status list
 ### Preview
 ![GCP Status Monitoring Preview](https://github.com/imprvhub/mcp-status-observer/raw/main/public/assets/gcp.png)
 
-### Natural Language Queries:
+### Natural Language Prompts:
 
 You can also interact with the MCP using natural language. Claude will interpret these requests and use the appropriate commands:
 
@@ -208,6 +209,7 @@ You can also interact with the MCP using natural language. Claude will interpret
 - "What's the current status of LinkedIn?"
 - "Pull Requests are down? What's the status of GitHub?"
 - "Can you tell me if Google's Gemini AI is experiencing any service disruptions or outages right now?"
+- "Check if Docker Hub Automated Builds is experiencing any outages"
 - "Show me the status of all major platforms"
 
 ## Troubleshooting

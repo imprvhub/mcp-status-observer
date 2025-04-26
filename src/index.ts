@@ -58,6 +58,19 @@ interface AtlassianStatusResponse {
   error?: string;
 }
 
+interface DockerStatusResponse {
+  overall: string;
+  lastUpdated: string;
+  services: Array<{
+    name: string;
+    status: string;
+    statusClass: string;
+    description?: string;
+  }>;
+  incidents?: Array<any>; 
+  error?: string;
+}
+
 interface GCPStatusResponse {
   overall: string;
   lastUpdated: string;
@@ -190,6 +203,7 @@ class StatusObserver {
   private platforms: Map<string, PlatformStatus>;
   private anthropicApiUrl: string;
   private atlassianApiUrl: string;
+  private dockerApiUrl: string;
   private geminiApiUrl: string;
   private linkedInApiUrl: string;
   private openaiApiUrl: string;
@@ -199,6 +213,7 @@ class StatusObserver {
   constructor() {
     this.anthropicApiUrl = 'https://status-observer-helpers.vercel.app/anthropic';
     this.atlassianApiUrl = 'https://status-observer-helpers.vercel.app/atlassian';
+    this.dockerApiUrl = 'https://status-observer-helpers.vercel.app/docker';
     this.geminiApiUrl = 'https://status-observer-helpers.vercel.app/gemini';
     this.linkedInApiUrl = 'https://status-observer-helpers.vercel.app/linkedin';
     this.openaiApiUrl = 'https://status-observer-helpers.vercel.app/openai';
@@ -216,6 +231,7 @@ class StatusObserver {
     this.addPlatform('cloudflare', 'Cloudflare', 'https://www.cloudflarestatus.com/api/v2/summary.json', 'Web infrastructure and security');
     this.addPlatform('digitalocean', 'DigitalOcean', 'https://status.digitalocean.com/api/v2/summary.json', 'Cloud infrastructure');
     this.addPlatform('discord', 'Discord', 'https://discordstatus.com/api/v2/summary.json', 'Messaging platform');
+    this.addPlatform('docker', 'Docker', this.dockerApiUrl, 'Container platform and services');
     this.addPlatform('dropbox', 'Dropbox', 'https://status.dropbox.com/api/v2/summary.json', 'File hosting');
     this.addPlatform('gcp', 'Google Cloud Platform', 'https://status-observer-helpers.vercel.app/gcp', 'Cloud computing services');
     this.addPlatform('gemini', 'Gemini', this.geminiApiUrl, 'Multimodal AI platform');
@@ -254,6 +270,10 @@ class StatusObserver {
 
       if (platformId === 'atlassian') {
         return await this.getAtlassianStatus(platform);
+      }
+
+      if (platformId === 'docker') {
+        return await this.getDockerStatus(platform);
       }
 
       if (platformId === 'gcp') {
@@ -388,6 +408,35 @@ class StatusObserver {
     } catch (error) {
       console.error(`Error fetching Atlassian status:`, error);
       return `Unable to fetch real-time status for Atlassian. The API might be unavailable.`;
+    }
+  }
+
+  private async getDockerStatus(platform: PlatformStatus): Promise<string> {
+    try {
+      const response = await axios.get<DockerStatusResponse>(platform.url);
+      const data = response.data;
+      
+      let statusOutput = `${platform.name} Status:\n`;
+      statusOutput += `Overall: ${this.normalizeStatus(data.overall)}\n\n`;
+      
+      if (data.services && data.services.length > 0) {
+        statusOutput += `Components:\n`;
+        data.services.forEach(service => {
+          statusOutput += `- ${service.name}: ${this.normalizeStatus(service.status)}\n`;
+          if (service.description) {
+            statusOutput += `  Description: ${service.description}\n`;
+          }
+        });
+      } else {
+        statusOutput += `No component information available.\n`;
+      }
+      
+      statusOutput += `\nLast Updated: ${this.formatUpdateTime(data.lastUpdated || new Date().toISOString())}`;
+      
+      return statusOutput;
+    } catch (error) {
+      console.error(`Error fetching Docker status:`, error);
+      return `Unable to fetch real-time status for Docker. The API might be unavailable.`;
     }
   }
 
@@ -797,6 +846,12 @@ class StatusObserver {
 
       if (platformId === 'atlassian') {
         const response = await axios.get<AtlassianStatusResponse>(platform.url);
+        const data = response.data;
+        return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
+      }
+
+      if (platformId === 'docker') {
+        const response = await axios.get<DockerStatusResponse>(platform.url);
         const data = response.data;
         return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
       }
