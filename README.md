@@ -1,7 +1,7 @@
 
 
 # MCP Status Observer
-
+[![Verified on MseeP](https://mseep.ai/badge.svg)](https://mseep.ai/app/d7d5a94b-3378-479b-b5a3-35efa8904d2e)
 [![smithery badge](https://smithery.ai/badge/@imprvhub/mcp-status-observer)](https://smithery.ai/server/@imprvhub/mcp-status-observer)
 
 <table style="border-collapse: collapse; width: 100%; table-layout: fixed;">
@@ -21,7 +21,7 @@
 </tr>
 </table>
 
-> [!NOTE]
+> [!IMPORTANT]
 > This project is continuously updated with new platform integrations. If you're not seeing a service that should be available, or if Claude doesn't recognize a platform, please update by running `npm run build` from a freshly cloned repository. 
 > 
 > **Last updated**: 2025-04-26T20:08:00Z (UTC) - Added Docker status integration
@@ -279,3 +279,5 @@ This project is licensed under the Mozilla Public License 2.0 - see the [LICENSE
 
 - [Model Context Protocol](https://modelcontextprotocol.io/)
 - [Claude Desktop](https://claude.ai/download)
+- [MCP Series](https://github.com/mcp-series)
+
