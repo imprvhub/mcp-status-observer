@@ -1,13 +1,23 @@
+
+
 # MCP Status Observer
 
 [![smithery badge](https://smithery.ai/badge/@imprvhub/mcp-status-observer)](https://smithery.ai/server/@imprvhub/mcp-status-observer)
 
 <table style="border-collapse: collapse; width: 100%; table-layout: fixed;">
 <tr>
+<td style="padding: 15px; vertical-align: middle; border: none; text-align: center;">
+  <a href="https://mseep.ai/app/imprvhub-mcp-status-observer">
+    <img src="https://mseep.net/pr/imprvhub-mcp-status-observer-badge.png" alt="MseeP.ai Security Assessment Badge" />
+  </a>
+</td>
 <td style="width: 40%; padding: 15px; vertical-align: middle; border: none;">An integration that allows Claude Desktop to monitor and query the operational status of major digital platforms using the Model Context Protocol (MCP).</td>
-<td style="width: 60%; padding: 0; vertical-align: middle; border: none; min-width: 300px; text-align: center;"><a href="https://glama.ai/mcp/servers/@imprvhub/mcp-status-observer">
-  <img style="max-width: 100%; height: auto; min-width: 300px;" src="https://glama.ai/mcp/servers/@imprvhub/mcp-status-observer/badge" alt="Status Observer MCP server" />
-</a></td>
+<td style="width: 60%; padding: 0; vertical-align: middle; border: none; min-width: 300px; text-align: center;">
+  <a href="https://glama.ai/mcp/servers/@imprvhub/mcp-status-observer">
+    <img style="max-width: 100%; height: auto; min-width: 300px;" src="https://glama.ai/mcp/servers/@imprvhub/mcp-status-observer/badge" alt="Status Observer MCP server" />
+  </a>
+</td>
+
 </tr>
 </table>
 
