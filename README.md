@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/imprvhub-mcp-status-observer-badge.png)](https://mseep.ai/app/imprvhub-mcp-status-observer)
+
 # MCP Status Observer
 
 [![smithery badge](https://smithery.ai/badge/@imprvhub/mcp-status-observer)](https://smithery.ai/server/@imprvhub/mcp-status-observer)
