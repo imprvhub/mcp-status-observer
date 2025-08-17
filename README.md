@@ -1,9 +1,7 @@
 
 
 # MCP Status Observer
-[![Verified on MseeP](https://mseep.ai/badge.svg)](https://mseep.ai/app/d7d5a94b-3378-479b-b5a3-35efa8904d2e)
-
-[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/imprvhub/mcp-status-observer)](https://archestra.ai/mcp-catalog/imprvhub__mcp-status-observer)
+[![Verified on MseeP](https://mseep.ai/badge.svg)](https://mseep.ai/app/d7d5a94b-3378-479b-b5a3-35efa8904d2e) [![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/imprvhub/mcp-status-observer)](https://archestra.ai/mcp-catalog/imprvhub__mcp-status-observer)
 [![smithery badge](https://smithery.ai/badge/@imprvhub/mcp-status-observer)](https://smithery.ai/server/@imprvhub/mcp-status-observer)
 
 <table style="border-collapse: collapse; width: 100%; table-layout: fixed;">
