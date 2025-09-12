@@ -149,6 +149,26 @@ interface OpenAIStatusResponse {
   error?: string;
 }
 
+interface OpenRouterStatusResponse {
+  overall: string;
+  lastUpdated: string;
+  services: Array<{
+    name: string;
+    status: string;
+    statusClass: string;
+  }>;
+  incidents?: Array<{
+    title: string;
+    description: string;
+    pubDate: string;
+    status: string;
+    impact: string;
+    isRecent: boolean;
+    link?: string;
+  }>;
+  error?: string;
+}
+
 interface XStatusResponse {
   overall: string;
   lastUpdated: string;
@@ -207,8 +227,10 @@ class StatusObserver {
   private geminiApiUrl: string;
   private linkedInApiUrl: string;
   private openaiApiUrl: string;
+  private openrouterApiUrl: string;
   private supabaseApiUrl: string;
   private xApiUrl: string;
+  private gcpApiUrl: string;
 
   constructor() {
     this.anthropicApiUrl = 'https://status-observer-helpers.vercel.app/anthropic';
@@ -217,9 +239,11 @@ class StatusObserver {
     this.geminiApiUrl = 'https://status-observer-helpers.vercel.app/gemini';
     this.linkedInApiUrl = 'https://status-observer-helpers.vercel.app/linkedin';
     this.openaiApiUrl = 'https://status-observer-helpers.vercel.app/openai';
-    this.platforms = new Map();
+    this.openrouterApiUrl = 'https://status-observer-helpers.vercel.app/openrouter';
     this.supabaseApiUrl = 'https://status-observer-helpers.vercel.app/supabase';
     this.xApiUrl = 'https://status-observer-helpers.vercel.app/x';
+    this.gcpApiUrl = 'https://status-observer-helpers.vercel.app/gcp';
+    this.platforms = new Map();
     this.initializePlatforms();
   }
 
@@ -233,13 +257,14 @@ class StatusObserver {
     this.addPlatform('discord', 'Discord', 'https://discordstatus.com/api/v2/summary.json', 'Messaging platform');
     this.addPlatform('docker', 'Docker', this.dockerApiUrl, 'Container platform and services');
     this.addPlatform('dropbox', 'Dropbox', 'https://status.dropbox.com/api/v2/summary.json', 'File hosting');
-    this.addPlatform('gcp', 'Google Cloud Platform', 'https://status-observer-helpers.vercel.app/gcp', 'Cloud computing services');
+    this.addPlatform('gcp', 'Google Cloud Platform', this.gcpApiUrl, 'Cloud computing services');
     this.addPlatform('gemini', 'Gemini', this.geminiApiUrl, 'Multimodal AI platform');
     this.addPlatform('github', 'GitHub', 'https://www.githubstatus.com/api/v2/summary.json', 'Version control platform');
     this.addPlatform('linkedin', 'LinkedIn', this.linkedInApiUrl, 'Professional network');
     this.addPlatform('netlify', 'Netlify', 'https://www.netlifystatus.com/api/v2/summary.json', 'Web development platform');
     this.addPlatform('npm', 'npm', 'https://status.npmjs.org/api/v2/summary.json', 'JavaScript package manager');
     this.addPlatform('openai', 'OpenAI', this.openaiApiUrl, 'AI services provider');
+    this.addPlatform('openrouter', 'OpenRouter', this.openrouterApiUrl, 'AI model routing and access platform');
     this.addPlatform('reddit', 'Reddit', 'https://www.redditstatus.com/api/v2/summary.json', 'Social news platform');
     this.addPlatform('slack', 'Slack', 'https://status.slack.com/api/v2.0.0/current', 'Business communication');
     this.addPlatform('supabase', 'Supabase', this.supabaseApiUrl, 'Open source backend platform');
@@ -292,6 +317,10 @@ class StatusObserver {
         return await this.getOpenAIStatus(platform);
       }
 
+      if (platformId === 'openrouter') {
+        return await this.getOpenRouterStatus(platform);
+      }
+
       if (platformId === 'supabase') {
         return await this.getSupabaseStatus(platform);
       }
@@ -335,6 +364,131 @@ class StatusObserver {
       console.error(`Error fetching status for ${platform.name}:`, error);
       
       return `Unable to fetch real-time status for ${platform.name}. The status API might be unavailable or the format has changed.`;
+    }
+  }
+
+  private async getOpenRouterStatus(platform: PlatformStatus): Promise<string> {
+    try {
+      const response = await axios.get<OpenRouterStatusResponse>(platform.url);
+      const data = response.data;
+      
+      let statusOutput = `${platform.name} Status:\n`;
+      statusOutput += `Overall: ${this.normalizeStatus(data.overall)}\n\n`;
+
+      if (data.services && data.services.length > 0) {
+        statusOutput += `Core Components:\n`;
+        data.services.forEach(service => {
+          statusOutput += `- ${service.name}: ${this.normalizeStatus(service.status)}\n`;
+        });
+        statusOutput += `\n`;
+      }
+
+      if (data.incidents && data.incidents.length > 0) {
+        // Filter recent incidents (last 7 days)
+        const recentIncidents = data.incidents.filter(incident => 
+          incident.isRecent || 
+          this.isRecentIncident(incident.pubDate)
+        );
+        
+        const activeIncidents = data.incidents.filter(incident => 
+          incident.status === 'active' && 
+          this.isRecentIncident(incident.pubDate)
+        );
+
+        if (activeIncidents.length > 0) {
+          statusOutput += `🚨 ACTIVE INCIDENTS:\n`;
+          activeIncidents.forEach(incident => {
+            statusOutput += `- ${incident.title}\n`;
+            statusOutput += `  Impact: ${this.formatImpact(incident.impact)}\n`;
+            statusOutput += `  Started: ${this.formatDate(incident.pubDate)}\n`;
+            if (incident.link) {
+              statusOutput += `  Details: ${incident.link}\n`;
+            }
+            statusOutput += `\n`;
+          });
+        }
+
+        if (recentIncidents.length > 0 && activeIncidents.length === 0) {
+          statusOutput += `Recent Resolved Incidents:\n`;
+          recentIncidents.slice(0, 3).forEach(incident => {
+            statusOutput += `- ${incident.title} (RESOLVED)\n`;
+            statusOutput += `  Impact: ${this.formatImpact(incident.impact)}\n`;
+            statusOutput += `  Date: ${this.formatDate(incident.pubDate)}\n`;
+            if (incident.description) {
+              const summary = incident.description.substring(0, 150);
+              statusOutput += `  Summary: ${summary}${incident.description.length > 150 ? '...' : ''}\n`;
+            }
+            if (incident.link) {
+              statusOutput += `  Details: ${incident.link}\n`;
+            }
+            statusOutput += `\n`;
+          });
+        }
+
+        if (recentIncidents.length === 0 && data.incidents.length > 0) {
+          statusOutput += `Recent Activity:\n`;
+          data.incidents.slice(0, 2).forEach(incident => {
+            statusOutput += `- ${incident.title}\n`;
+            statusOutput += `  Impact: ${this.formatImpact(incident.impact)}\n`;
+            statusOutput += `  Date: ${this.formatDate(incident.pubDate)}\n`;
+            if (incident.link) {
+              statusOutput += `  Details: ${incident.link}\n`;
+            }
+            statusOutput += `\n`;
+          });
+        }
+      } else {
+        statusOutput += `No recent incidents reported.\n`;
+      }
+      
+      statusOutput += `Last Updated: ${this.formatUpdateTime(data.lastUpdated || new Date().toISOString())}`;
+      
+      return statusOutput;
+    } catch (error) {
+      console.error(`Error fetching OpenRouter status:`, error);
+      return `Unable to fetch real-time status for OpenRouter. The API might be unavailable.`;
+    }
+  }
+
+  private isRecentIncident(pubDate: string): boolean {
+    try {
+      const incidentDate = new Date(pubDate);
+      const now = new Date();
+      const daysDiff = (now.getTime() - incidentDate.getTime()) / (1000 * 3600 * 24);
+      return daysDiff <= 7; // Consider 7 days as recent
+    } catch (error) {
+      return false;
+    }
+  }
+
+  private formatImpact(impact: string): string {
+    switch (impact.toLowerCase()) {
+      case 'major':
+        return 'Major Outage 🔴';
+      case 'degraded':
+        return 'Degraded Performance ⚠️';
+      case 'maintenance':
+        return 'Maintenance 🔧';
+      case 'minor':
+        return 'Minor Issue 🟡';
+      default:
+        return impact.charAt(0).toUpperCase() + impact.slice(1);
+    }
+  }
+
+  private formatDate(dateString: string): string {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit',
+        timeZoneName: 'short'
+      });
+    } catch (error) {
+      return dateString;
     }
   }
 
@@ -826,7 +980,7 @@ class StatusObserver {
     });
     
     const platformStatuses = await Promise.all(platformPromises);
-    result += platformStatuses.join('\n\n');
+    result += platformStatuses.join('\n\n---\n\n');
     
     return result;
   }
@@ -880,6 +1034,12 @@ class StatusObserver {
         return `${platform.name}: ${this.normalizeStatus(data.overall)}`;
       }
 
+      if (platformId === 'openrouter') {
+        const response = await axios.get<OpenRouterStatusResponse>(platform.url);
+        const data = response.data;
+        return `${platform.name}: ${this.normalizeStatus(data.overall)}${data.incidents && data.incidents.some(inc => inc.isRecent && inc.status === 'active') ? ' (Active Issues)' : ''}`;
+      }
+
       if (platformId === 'supabase') {
         const response = await axios.get<SupabaseStatusResponse>(platform.url);
         const data = response.data;
@@ -930,13 +1090,13 @@ const server = new Server(
     capabilities: {
       tools: {
         status: {
-          description: "Check operational status of major digital platforms",
+          description: "Check operational status of major digital platforms including AI providers, cloud services, and developer tools",
           schema: {
             type: "object",
             properties: {
               command: {
                 type: "string",
-                description: "Command to execute (list, --all, or platform with -- prefix like --github)"
+                description: "Command to execute (list, --all, or platform with -- prefix like --openrouter, --openai, --github)"
               }
             },
             required: ["command"]
@@ -952,13 +1112,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "status",
-        description: "Check operational status of major digital platforms",
+        description: "Check operational status of major digital platforms including AI providers like OpenRouter, OpenAI, Anthropic; cloud services like GCP, Vercel; and developer tools",
         inputSchema: {
           type: "object",
           properties: {
             command: {
               type: "string",
-              description: "Command to execute (list, --all, or platform with -- prefix like --github)"
+              description: "Command to execute (list, --all, or platform with -- prefix like --openrouter, --openai, --github, --gcp)"
             }
           },
           required: ["command"]
@@ -1004,7 +1164,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ]
         };
       } else {
-        throw new Error(`Unknown command: ${command}. Available commands: list, --all, or platform with -- prefix like --github`);
+        throw new Error(`Unknown command: ${command}. Available commands: list, --all, or platform with -- prefix like --openrouter, --openai, --github`);
       }
     }
     
