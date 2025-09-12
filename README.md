@@ -1,5 +1,3 @@
-
-
 # MCP Status Observer
 [![Verified on MseeP](https://mseep.ai/badge.svg)](https://mseep.ai/app/d7d5a94b-3378-479b-b5a3-35efa8904d2e) [![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/imprvhub/mcp-status-observer)](https://archestra.ai/mcp-catalog/imprvhub__mcp-status-observer)
 [![smithery badge](https://smithery.ai/badge/@imprvhub/mcp-status-observer)](https://smithery.ai/server/@imprvhub/mcp-status-observer)
@@ -11,7 +9,7 @@
     <img src="https://mseep.net/pr/imprvhub-mcp-status-observer-badge.png" alt="MseeP.ai Security Assessment Badge" />
   </a>
 </td>
-<td style="width: 40%; padding: 15px; vertical-align: middle; border: none;">An integration that allows Claude Desktop to monitor and query the operational status of major digital platforms using the Model Context Protocol (MCP).</td>
+<td style="width: 40%; padding: 15px; vertical-align: middle; border: none;">An integration that allows Claude Desktop to monitor and query the operational status of major digital platforms including AI providers, cloud services, and developer tools using the Model Context Protocol (MCP).</td>
 <td style="width: 60%; padding: 0; vertical-align: middle; border: none; min-width: 300px; text-align: center;">
   <a href="https://glama.ai/mcp/servers/@imprvhub/mcp-status-observer">
     <img style="max-width: 100%; height: auto; min-width: 300px;" src="https://glama.ai/mcp/servers/@imprvhub/mcp-status-observer/badge" alt="Status Observer MCP server" />
@@ -24,15 +22,17 @@
 > [!IMPORTANT]
 > This project is continuously updated with new platform integrations. If you're not seeing a service that should be available, or if Claude doesn't recognize a platform, please update by running `npm run build` from a freshly cloned repository. 
 > 
-> **Last updated**: 2025-04-26T20:08:00Z (UTC) - Added Docker status integration
+> **Last updated**: 2025-09-12T07:22:15Z (UTC) - Added OpenRouter status integration with RSS incident tracking
 
 ## Features
 
 - Monitor world's most used digital platforms (GitHub, Slack, Discord, etc.)
-- Get detailed status information for specific services
+- Track AI providers including OpenRouter, OpenAI, Anthropic, and Gemini
+- Get detailed status information for specific services with incident history
 - Check status of specific components within each platform
-- Simple query interface with commands like `status --github`.
-- Real-time updates of service status
+- Real-time updates of service status with impact analysis
+- Comprehensive incident tracking with resolution status and timelines
+- Simple query interface with commands like `status --openrouter`
 
 ## Demo
 
@@ -60,7 +60,7 @@ In-depth examination of Vercel's global edge network and deployment infrastructu
 Extensive analysis of Cloudflare's global infrastructure status, detailing service availability across geographic regions and specific service components. Identified performance degradation in multiple regions (Africa, Asia, Europe, Latin America, Middle East, North America) while core services remain functional. Includes detailed assessment of regional data centers under maintenance and technical impact analysis.
 
 [**01:46**](https://www.youtube.com/watch?v=EV1ac0PMzKg&t=106s) - **Global Operational Status Report**  
-Consolidated overview of operational status across all major technology platforms and service providers, highlighting both fully operational services (GitHub, Vercel, Netlify, Asana, Atlassian, etc.) and services experiencing degraded performance (Cloudflare, Twilio). Includes strategic recommendations for organizations with dependencies on affected services.
+Consolidated overview of operational status across all major technology platforms and service providers, highlighting both fully operational services (GitHub, Vercel, Netlify, Asana, Atlassian, OpenRouter, etc.) and services experiencing degraded performance (Cloudflare, Twilio). Includes strategic recommendations for organizations with dependencies on affected services.
 </details>
 
 ## Requirements
@@ -171,8 +171,46 @@ The Status Observer MCP provides a single tool named `status` with several comma
 | Command | Description | Parameters | Example |
 |---------|-------------|------------|---------|
 | `list` | List all available platforms | None | `status list` |
-| `--[platform]` | Get status for a specific platform | Platform name | `status --github` |
+| `--[platform]` | Get status for a specific platform | Platform name | `status --openrouter` |
 | `--all` | Get status for all platforms | None | `status --all` |
+
+## Supported Platforms
+
+The Status Observer monitors 22 major digital platforms across various categories:
+
+### AI & Machine Learning (4)
+- **OpenRouter** - AI model routing and access platform
+- **OpenAI** - Leading AI services provider (ChatGPT, DALL-E, API)
+- **Anthropic** - AI assistant provider (Claude)
+- **Gemini** - Google's multimodal AI platform
+
+### Cloud Infrastructure (4)
+- **Google Cloud Platform** - Comprehensive cloud computing services
+- **DigitalOcean** - Developer-focused cloud infrastructure
+- **Vercel** - Frontend deployment and edge platform
+- **Netlify** - Web development and deployment platform
+
+### Developer Tools & Platforms (5)
+- **Docker** - Container platform and services
+- **GitHub** - Version control and collaboration platform
+- **npm** - JavaScript package manager and registry
+- **Atlassian** - Developer collaboration tools (Jira, Bitbucket, Confluence)
+- **Supabase** - Open source backend platform (PostgreSQL, auth, storage)
+
+### Productivity & Collaboration (5)
+- **LinkedIn** - Professional networking platform
+- **Slack** - Business communication and collaboration
+- **Asana** - Team workflow and project management
+- **Dropbox** - Cloud file storage and collaboration
+- **X (Twitter)** - Social media and real-time communication
+
+### Web Infrastructure & Security (3)
+- **Cloudflare** - Web infrastructure, CDN, and security
+- **Discord** - Developer community and communication platform
+- **Reddit** - Social news and developer community platform
+
+### Analytics & Business Tools (1)
+- **Amplitude** - Product analytics platform
 
 ## Example Usage
 
@@ -181,46 +219,61 @@ Here are various examples of how to use the Status Observer with Claude:
 ### Direct Commands:
 
 ```
-status --all
-status --amplitude
-status --anthropic
-status --asana
-status --atlassian
-status --cloudflare
-status --digitalocean
-status --discord
-status --docker
-status --dropbox
-status --gcp
-status --gemini 
-status --github
-status --linkedin
-status --netlify
-status --npm
+# AI Platforms
+status --openrouter
 status --openai
-status --reddit
-status --slack
-status --twilio
+status --anthropic
+status --gemini
+
+# Cloud Infrastructure
+status --gcp
 status --vercel
+status --digitalocean
+status --netlify
+
+# Developer Tools
+status --docker
+status --github
+status --atlassian
+status --supabase
+status --npm
+
+# Productivity & Social
+status --linkedin
+status --slack
 status --x
+status --dropbox
+
+# Web Infrastructure
+status --cloudflare
+status --discord
+
+# All platforms
+status --all
 status list
 ```
 
 ### Preview
+![OpenRouter Status Monitoring Preview](https://github.com/imprvhub/mcp-status-observer/raw/main/public/assets/openrouter.png)
 ![GCP Status Monitoring Preview](https://github.com/imprvhub/mcp-status-observer/raw/main/public/assets/gcp.png)
 
 ### Natural Language Prompts:
 
 You can also interact with the MCP using natural language. Claude will interpret these requests and use the appropriate commands:
 
-- "Could you check if there are any issues with Google Cloud Platform services right now?"
-- "Has there been any recent issues with Claude or the Anthropic API?"
-- "Is OpenAI experiencing any outages at the moment?"
-- "What's the current status of LinkedIn?"
-- "Pull Requests are down? What's the status of GitHub?"
-- "Can you tell me if Google's Gemini AI is experiencing any service disruptions or outages right now?"
-- "Check if Docker Hub Automated Builds is experiencing any outages"
-- "Show me the status of all major platforms"
+- "Could you check if OpenRouter is having any API issues right now?"
+- "What's the status of OpenAI's ChatGPT service?"
+- "Has there been any recent incidents with Claude or the Anthropic API?"
+- "Is Google Cloud Platform experiencing any outages in my region?"
+- "Check if Docker Hub is operational for automated builds"
+- "What's the current status of LinkedIn's Sales Navigator?"
+- "Can you tell me if Google's Gemini AI is experiencing any service disruptions?"
+- "Show me the status of all AI platforms including OpenRouter and OpenAI"
+- "Are there any active incidents affecting GitHub Actions or Git operations?"
+- "Check the overall health of Vercel and Netlify for my deployment pipeline"
+- "Has Supabase had any recent database or authentication issues?"
+- "What's the status of all major platforms right now?"
+
 
 ## Troubleshooting
 
@@ -269,7 +322,32 @@ Example:
 this.addPlatform('newservice', 'New Service', 'https://status.newservice.com/api/v2/summary.json', 'Description of the service');
 ```
 
-Different status APIs may return data in different formats. If a new platform's API returns data in a format that isn't handled by the existing code, you might need to add specific parsing logic for that platform.
+### Custom API Integration
+
+For platforms with non-standard status pages (like OpenRouter, OpenAI, Anthropic), you can create custom handlers:
+
+1. Add the platform to `initializePlatforms()`
+2. Create a TypeScript interface for the response format
+3. Add a specific handler method like `getOpenRouterStatus()`
+4. Update the main `getPlatformStatus()` method to route to your handler
+5. Add quick status support in `getQuickPlatformStatus()`
+
+Example structure for custom handlers:
+```typescript
+private async getCustomPlatformStatus(platform: PlatformStatus): Promise<string> {
+  // Custom parsing logic for your platform
+  // Return formatted status text
+}
+```
+
+### Platform Categories
+
+When adding new platforms, consider organizing them into logical categories:
+- **AI/ML**: OpenRouter, OpenAI, Anthropic, Gemini
+- **Cloud Infrastructure**: GCP, AWS, Azure, DigitalOcean
+- **Developer Tools**: GitHub, GitLab, Docker, npm
+- **Productivity**: Slack, Microsoft 365, Google Workspace
+- **Web Infrastructure**: Cloudflare, Fastly, Akamai
 
 ## License
 
@@ -281,3 +359,14 @@ This project is licensed under the Mozilla Public License 2.0 - see the [LICENSE
 - [Claude Desktop](https://claude.ai/download)
 - [MCP Series](https://github.com/mcp-series)
 
+## Changelog
+
+- **2025-09-12**: Added OpenRouter integration with RSS incident tracking and detailed impact analysis
+- **2025-04-26**: Added Docker status integration with comprehensive component monitoring
+- **2025-03-15**: Enhanced GCP regional status reporting with incident correlation
+- **2025-02-28**: Added Anthropic and Gemini AI platform monitoring
+- **2025-01-20**: Initial release with core platform support (GitHub, Vercel, Cloudflare, etc.)
+
+---
+
+*Built for the developer community by [imprvhub](https://github.com/imprvhub)*
