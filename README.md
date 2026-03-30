@@ -24,6 +24,10 @@
 > 
 > **Last updated**: 2025-09-12T07:22:15Z (UTC) - Added OpenRouter status integration with RSS incident tracking
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/imprvhub-mcp-status-observer).
+
 ## Features
 
 - Monitor world's most used digital platforms (GitHub, Slack, Discord, etc.)
