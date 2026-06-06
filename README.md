@@ -1,5 +1,5 @@
 # MCP Status Observer
-(https://archestra.ai/mcp-catalog/api/badge/quality/imprvhub/mcp-status-observer)](https://archestra.ai/mcp-catalog/imprvhub__mcp-status-observer)
+![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/imprvhub/mcp-status-observer)
 [![smithery badge](https://smithery.ai/badge/@imprvhub/mcp-status-observer)](https://smithery.ai/server/@imprvhub/mcp-status-observer)
 
 <table style="border-collapse: collapse; width: 100%; table-layout: fixed;">
