@@ -1,0 +1,45 @@
+{
+  "manifest_version": "0.2",
+  "name": "mcp-status-observer",
+  "display_name": "Status Observer MCP",
+  "version": "0.8.0",
+  "description": "Check the operational status of 21 major platforms from their official status APIs.",
+  "long_description": "A Model Context Protocol server that reports the operational status of 21 widely used platforms — AI providers (Anthropic, OpenAI, Gemini), clouds (GCP, Cloudflare, DigitalOcean, Vercel, Netlify, Supabase) and developer or workplace tools (GitHub, Docker, npm, Slack, Atlassian, Discord, Dropbox, Twilio, Asana, Reddit, LinkedIn, Amplitude). Every platform is read directly from its vendor's own status API: overall status, any component that is not operational, active incidents and scheduled maintenance.",
+  "author": {
+    "name": "Iván Luna",
+    "email": "contact@ivanluna.dev",
+    "url": "https://github.com/imprvhub"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imprvhub/mcp-status-observer"
+  },
+  "homepage": "https://github.com/imprvhub/mcp-status-observer",
+  "documentation": "https://github.com/imprvhub/mcp-status-observer#readme",
+  "license": "MPL-2.0",
+  "keywords": [
+    "status",
+    "monitoring",
+    "statuspage",
+    "uptime",
+    "incidents",
+    "mcp"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "build/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/build/index.js"
+      ],
+      "env": {}
+    }
+  },
+  "compatibility": {
+    "runtimes": {
+      "node": ">=20"
+    }
+  },
+  "user_config": {}
+}
